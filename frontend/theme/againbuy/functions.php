@@ -58,7 +58,10 @@ add_action('woocommerce_before_customer_login_form', static function (): void {
         echo '<nav class="auth-switch" aria-label="Account access"><a href="' . esc_url($account) . '"' . (!$create ? ' aria-current="page"' : '') . '>Sign in</a><a href="' . esc_url(add_query_arg('account', 'create', $account)) . '"' . ($create ? ' aria-current="page"' : '') . '>Create account</a></nav>';
     }
     if (shortcode_exists('nextend_social_login')) {
-        echo '<div class="auth-social">' . do_shortcode('[nextend_social_login provider="google"]') . '</div>';
+        $google = do_shortcode('[nextend_social_login provider="google"]');
+        if (str_contains($google, 'nsl-button-google')) {
+            echo '<div class="auth-social">' . $google . '</div><div class="auth-divider"><span>' . ($create ? 'or create an account with email' : 'or sign in with email') . '</span></div>';
+        }
     }
 });
 add_filter('woocommerce_catalog_orderby', static function (array $options): array {
