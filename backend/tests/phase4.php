@@ -21,6 +21,16 @@ if (!$india_rate || $india_rate->enabled !== 'yes' || (float) $india_rate->get_o
 }
 $india_match = WC_Shipping_Zones::get_zone_matching_package(['destination' => ['country' => 'IN', 'state' => '', 'postcode' => '110001']]);
 if ($india_match->get_id() !== (int) $india_zone['zone_id']) { throw new RuntimeException('Indian checkout does not match the India delivery zone'); }
+if ((getenv('INTERNATIONAL_DELIVERY_CHARGE_USD') ?: '') === '') {
+    $us_zone = array_values(array_filter(WC_Shipping_Zones::get_zones(), static fn($item) => $item['zone_name'] === 'United States'))[0];
+    foreach ([(new WC_Shipping_Zone($us_zone['zone_id'])), (new WC_Shipping_Zone(0))] as $zone) {
+        foreach ($zone->get_shipping_methods(true) as $method) {
+            if ($method->get_option('title') === 'International delivery' && $method->enabled === 'yes') {
+                throw new RuntimeException('International delivery must stay unavailable without its environment charge');
+            }
+        }
+    }
+}
 if (!file_exists(WP_PLUGIN_DIR . '/woo-razorpay/woo-razorpay.php')) {
     throw new RuntimeException('Official Razorpay plugin is not installed');
 }
