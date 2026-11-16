@@ -55,6 +55,12 @@ def run():
                 assert product["title"] and product["price"] and product["cart"] and product["photos"] > 1 and product["related"] > 0, f"Product detail failed: {product}"
                 browser.navigate(BASE + "/my-account/")
                 assert browser.evaluate("!!document.querySelector('.woocommerce-form-register')"), "Customer registration form is missing"
+                assert browser.evaluate("getComputedStyle(document.querySelector('#customer_login .u-column1')).display !== 'none' && getComputedStyle(document.querySelector('#customer_login .u-column2')).display === 'none'"), "Sign-in must show only the login form"
+                browser.navigate(BASE + "/my-account/?account=create")
+                assert browser.evaluate("getComputedStyle(document.querySelector('#customer_login .u-column1')).display === 'none' && getComputedStyle(document.querySelector('#customer_login .u-column2')).display !== 'none'"), "Create account must show only the registration form"
+                for width in (320, 390, 768, 1280):
+                    browser.call("Emulation.setDeviceMetricsOverride", {"width": width, "height": 850, "deviceScaleFactor": 1, "mobile": width < 768})
+                    assert browser.evaluate("document.documentElement.scrollWidth <= innerWidth + 1"), f"Registration overflow at {width}px"
                 browser.navigate(BASE + "/")
                 browser.evaluate("document.querySelector('a.add_to_cart_button')?.click()")
                 wait_for(lambda: browser.evaluate("Number(document.querySelector('.header-cart-count')?.innerText) === 1"), "AJAX cart count did not update")

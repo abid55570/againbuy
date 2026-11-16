@@ -39,6 +39,28 @@ add_filter('woocommerce_add_to_cart_fragments', static function (array $fragment
 });
 
 add_filter('loop_shop_per_page', static fn() => 16);
+function againbuy_registration_view(): bool {
+    return get_option('woocommerce_enable_myaccount_registration') === 'yes'
+        && (isset($_POST['register']) || (isset($_GET['account']) && $_GET['account'] === 'create'));
+}
+add_filter('body_class', static function (array $classes): array {
+    if (is_account_page() && !is_user_logged_in() && !is_wc_endpoint_url()) {
+        $classes[] = 'againbuy-auth';
+        $classes[] = againbuy_registration_view() ? 'auth-create' : 'auth-login';
+    }
+    return $classes;
+});
+add_action('woocommerce_before_customer_login_form', static function (): void {
+    $create = againbuy_registration_view();
+    echo '<div class="auth-heading"><h1>' . ($create ? 'Create your account' : 'Welcome back') . '</h1><p>' . ($create ? 'Keep your orders and delivery details in one place.' : 'Sign in to view your orders and account details.') . '</p></div>';
+    if (get_option('woocommerce_enable_myaccount_registration') === 'yes') {
+        $account = wc_get_page_permalink('myaccount');
+        echo '<nav class="auth-switch" aria-label="Account access"><a href="' . esc_url($account) . '"' . (!$create ? ' aria-current="page"' : '') . '>Sign in</a><a href="' . esc_url(add_query_arg('account', 'create', $account)) . '"' . ($create ? ' aria-current="page"' : '') . '>Create account</a></nav>';
+    }
+    if (shortcode_exists('nextend_social_login')) {
+        echo '<div class="auth-social">' . do_shortcode('[nextend_social_login provider="google"]') . '</div>';
+    }
+});
 add_filter('woocommerce_catalog_orderby', static function (array $options): array {
     return array_intersect_key($options, array_flip(['menu_order', 'date', 'price', 'price-desc']));
 });
