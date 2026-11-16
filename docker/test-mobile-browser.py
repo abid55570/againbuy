@@ -52,6 +52,8 @@ class Browser:
 
     def navigate(self, url):
         previous = self.evaluate("location.href")
+        if previous == url:
+            return
         self.call("Page.navigate", {"url": url})
         wait_for(lambda: self.evaluate(f"location.href !== {json.dumps(previous)} && document.readyState === 'complete' && document.body && document.body.innerText.length > 0"), f"Page did not load: {url}")
 

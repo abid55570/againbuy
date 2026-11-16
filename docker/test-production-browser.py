@@ -8,6 +8,7 @@ import time
 import urllib.request
 import urllib.parse
 import http.cookiejar
+import base64
 from pathlib import Path
 
 from websockets.sync.client import connect
@@ -41,7 +42,7 @@ def run():
                 browser = Browser(socket)
                 browser.call("Page.enable")
                 browser.call("Runtime.enable")
-                paths = ("/", "/shop/", "/product/muzzo-copper-kit/", "/cart/", "/my-account/")
+                paths = ("/", "/shop/", "/product-category/bottle/", "/?s=bottle&post_type=product", "/product/muzzo-copper-kit/", "/cart/", "/my-account/", "/my-account/lost-password/")
                 for width in (320, 390, 768, 1280):
                     browser.call("Emulation.setDeviceMetricsOverride", {"width": width, "height": 850, "deviceScaleFactor": 1, "mobile": width < 768})
                     for path in paths:
@@ -74,6 +75,11 @@ def run():
                 browser.evaluate("document.querySelector('a.add_to_cart_button')?.click()")
                 wait_for(lambda: browser.evaluate("Number(document.querySelector('.header-cart-count')?.innerText) === 1"), "AJAX cart count did not update")
                 wait_for(lambda: browser.evaluate("document.querySelector('.againbuy-cart-toast')?.classList.contains('is-visible')"), "Cart confirmation toast did not appear")
+                for path in ('/cart/', '/checkout/'):
+                    browser.navigate(BASE + path)
+                    for width in (320, 390, 768, 1280):
+                        browser.call('Emulation.setDeviceMetricsOverride', {'width': width, 'height': 850, 'deviceScaleFactor': 1, 'mobile': width < 768})
+                        assert browser.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'), f'Cart/checkout overflow: {path}, {width}px'
                 print("Production catalog and product detail passed.")
                 env = dict(line.split('=', 1) for line in Path(__file__).resolve().parents[1].joinpath('.env').read_text().splitlines() if '=' in line and not line.startswith('#'))
                 if not env.get('ANALYTICS_USER') or not env.get('ANALYTICS_PASSWORD'):
@@ -93,9 +99,18 @@ def run():
                         browser.navigate(BASE + path)
                         state = browser.evaluate("({signed:document.body.classList.contains('againbuy-account'),nav:!!document.querySelector('.woocommerce-MyAccount-navigation'),content:!!document.querySelector('.woocommerce-MyAccount-content'),overflow:document.documentElement.scrollWidth>innerWidth+1})")
                         assert state['signed'] and state['nav'] and state['content'] and not state['overflow'], f'Signed-in account layout failed at {width}px: {path}, {state}'
+                        placement = browser.evaluate("(()=>{const n=document.querySelector('.woocommerce-MyAccount-navigation').getBoundingClientRect();const c=document.querySelector('.woocommerce-MyAccount-content').getBoundingClientRect();return {navTop:n.top,contentTop:c.top,navRight:n.right,contentLeft:c.left,contentWidth:c.width}})()")
+                        if width > 650:
+                            assert abs(placement['navTop'] - placement['contentTop']) < 2 and placement['contentLeft'] > placement['navRight'] and placement['contentWidth'] >= 400, f'Account sidebar/content placement failed: {placement}'
                         if path == '/my-account/':
                             assert browser.evaluate("document.querySelectorAll('.account-shortcuts>a').length") == 3, 'Account dashboard shortcuts missing'
                     print(f'Signed-in account pages passed: {width}px')
+                    if width in (390, 1280):
+                        browser.navigate(BASE + '/my-account/')
+                        output = Path(__file__).resolve().parents[1] / 'artifacts'
+                        output.mkdir(exist_ok=True)
+                        shot = browser.call('Page.captureScreenshot', {'format': 'png', 'captureBeyondViewport': False})
+                        (output / f'account-{width}.png').write_bytes(base64.b64decode(shot['data']))
         finally:
             process.terminate()
             try:
