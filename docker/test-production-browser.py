@@ -50,6 +50,7 @@ def run():
                         state = browser.evaluate("({protocol:location.protocol,width:innerWidth,scroll:document.documentElement.scrollWidth,main:!!document.querySelector('main'),broken:[...document.images].filter(i=>i.complete&&i.naturalWidth===0).length})")
                         assert state["protocol"] == "https:" and state["main"] and state["broken"] == 0, f"Page failed at {width}px: {path}, {state}"
                         assert state["scroll"] <= state["width"] + 1, f"Horizontal overflow at {width}px: {path}, {state}"
+                        assert browser.evaluate("document.querySelector('.header-account')?.innerText === 'Sign in'"), 'Signed-out header state is unclear'
                     print(f"Production layout passed: {width}px")
                     browser.navigate(BASE + "/shop/")
                     browser.evaluate("window.scrollTo(0, 650)")
@@ -99,6 +100,7 @@ def run():
                         browser.navigate(BASE + path)
                         state = browser.evaluate("({signed:document.body.classList.contains('againbuy-account'),nav:!!document.querySelector('.woocommerce-MyAccount-navigation'),content:!!document.querySelector('.woocommerce-MyAccount-content'),overflow:document.documentElement.scrollWidth>innerWidth+1})")
                         assert state['signed'] and state['nav'] and state['content'] and not state['overflow'], f'Signed-in account layout failed at {width}px: {path}, {state}'
+                        assert browser.evaluate("document.querySelector('.header-account.is-signed-in .account-name')?.innerText.length > 0 && document.querySelector('.header-account .account-status')?.innerText === 'Signed in' && getComputedStyle(document.querySelector('.header-account')).display !== 'none' && !!document.querySelector('.mobile-account.is-signed-in')"), 'Signed-in status missing from header or mobile navigation'
                         placement = browser.evaluate("(()=>{const n=document.querySelector('.woocommerce-MyAccount-navigation').getBoundingClientRect();const c=document.querySelector('.woocommerce-MyAccount-content').getBoundingClientRect();return {navTop:n.top,contentTop:c.top,navRight:n.right,contentLeft:c.left,contentWidth:c.width}})()")
                         if width > 650:
                             assert abs(placement['navTop'] - placement['contentTop']) < 2 and placement['contentLeft'] > placement['navRight'] and placement['contentWidth'] >= 400, f'Account sidebar/content placement failed: {placement}'
