@@ -1,0 +1,5 @@
+.checkout-location{margin:0 0 20px;padding:12px;border:1px solid #e5e9e1;border-radius:10px;background:#f8f7f1}
+.checkout-location button{border:1px solid #255241;border-radius:999px;background:#fff;color:#255241;padding:9px 16px;font-weight:700}
+.checkout-location button:hover{background:#edf2eb}
+.checkout-location button:disabled{opacity:.6;cursor:wait}
+.checkout-location p{margin:8px 0 0;font-size:13px;color:#65736d}

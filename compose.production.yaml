@@ -1,0 +1,7 @@
+services:
+  db:
+    restart: unless-stopped
+  wordpress:
+    restart: unless-stopped
+  redis:
+    restart: unless-stopped

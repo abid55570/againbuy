@@ -1,0 +1,214 @@
+[
+  {
+    "source_id": "copper-kit",
+    "name": "Hammered Copper Bottle & Carry Pouch Set",
+    "category": "Bottle",
+    "inr_price": 1499,
+    "description": "Hammered copper bottle with fabric carry pouch and cleaning brush, as shown in the supplied photos.",
+    "facts": [
+      "Bottle, carry pouch and cleaning brush shown",
+      "17 supplied photos",
+      "Capacity and material grade were not provided"
+    ],
+    "images": [
+      "media/copper-kit/01.jpg",
+      "media/copper-kit/02.jpg",
+      "media/copper-kit/04.jpg",
+      "media/copper-kit/05.jpg",
+      "media/copper-kit/06.jpg",
+      "media/copper-kit/07.jpg",
+      "media/copper-kit/08.jpg",
+      "media/copper-kit/09.jpg",
+      "media/copper-kit/10.jpg",
+      "media/copper-kit/11.jpg",
+      "media/copper-kit/12.jpg",
+      "media/copper-kit/13.jpg",
+      "media/copper-kit/14.jpg",
+      "media/copper-kit/15.jpg",
+      "media/copper-kit/16.jpg",
+      "media/copper-kit/17.jpg"
+    ],
+    "usd_price": "15.74"
+  },
+  {
+    "source_id": "reversible-belt",
+    "name": "Muzzo Men’s Genuine Leather Reversible Belt with Metal Buckle",
+    "category": "Belts",
+    "inr_price": 999,
+    "description": "Reversible black and brown leather belt with a rotating metal buckle.",
+    "facts": [
+      "Genuine leather and metal buckle",
+      "Black and brown sides",
+      "Sizes 28, 30 and 32",
+      "Wipe with a soft dry cloth"
+    ],
+    "images": [
+      "media/reversible-belt/01.jpg",
+      "media/reversible-belt/03.jpg"
+    ],
+    "usd_price": "10.49"
+  },
+  {
+    "source_id": "leather-wallet",
+    "name": "mens leathre wallet",
+    "category": "Wallets",
+    "inr_price": 599,
+    "description": "Muzzo premium leather wallet.",
+    "facts": [
+      "Premium leather according to Muzzo",
+      "Further dimensions and compartments are not specified"
+    ],
+    "images": [
+      "media/leather-wallet/01.jpg"
+    ],
+    "usd_price": "6.29"
+  },
+  {
+    "source_id": "classic-belt",
+    "name": "muzzo belt",
+    "category": "Belts",
+    "inr_price": 1999,
+    "description": "Muzzo genuine leather belt.",
+    "facts": [
+      "Genuine leather according to Muzzo",
+      "Sizes 28 to 44"
+    ],
+    "images": [
+      "media/classic-belt/01.jpg"
+    ],
+    "usd_price": "20.99"
+  },
+  {
+    "source_id": "card-wallet",
+    "name": "Muzzo Wallet Card Plus Card Black",
+    "category": "Wallets",
+    "inr_price": 999,
+    "description": "Genuine leather bifold wallet with a slim design.",
+    "facts": [
+      "Genuine leather",
+      "Black and brown options",
+      "8 card slots and 2 currency compartments",
+      "No coin pocket",
+      "Made in India"
+    ],
+    "images": [
+      "media/card-wallet/01.jpg",
+      "media/card-wallet/02.jpg",
+      "media/card-wallet/03.jpg",
+      "media/card-wallet/05.jpg",
+      "media/card-wallet/06.jpg"
+    ],
+    "usd_price": "10.49"
+  },
+  {
+    "source_id": "groove-belt",
+    "name": "LINEAR GROOVE TEXTURED DUAL TONE BUCKLE BELT",
+    "category": "Belts",
+    "inr_price": 1999,
+    "description": "Textured leather belt with a dual-tone metal buckle.",
+    "facts": [
+      "Genuine leather; metal alloy buckle",
+      "Black and brown options",
+      "35 mm width",
+      "Pin buckle",
+      "Sizes 28 to 44"
+    ],
+    "images": [
+      "media/groove-belt/01.jpg",
+      "media/groove-belt/02.jpg",
+      "media/groove-belt/03.jpg",
+      "media/groove-belt/04.jpg",
+      "media/groove-belt/05.jpg"
+    ],
+    "usd_price": "20.99"
+  },
+  {
+    "source_id": "sling-bag",
+    "name": "Black Women Sling Bag | REAL LEATHER SATCHEL FOR WOMEN",
+    "category": "Handbags",
+    "inr_price": 2999,
+    "description": "Leather sling bag with a textured finish, top handle and adjustable shoulder strap.",
+    "facts": [
+      "Genuine leather according to Muzzo",
+      "Metal lock closure",
+      "Detachable shoulder strap",
+      "Main compartment and inner pocket",
+      "Black, brown, tan, maroon and green options"
+    ],
+    "images": [
+      "media/sling-bag/01.jpg"
+    ],
+    "usd_price": "31.49"
+  },
+  {
+    "source_id": "black-satchel",
+    "name": "Black Women Satchel | WOMEN GENUINE LEATHER SATCHEL | REAL LEATHER CROSSBODY BAG",
+    "category": "Handbags",
+    "inr_price": 4999,
+    "description": "Structured leather handbag with top handles and a detachable shoulder strap.",
+    "facts": [
+      "Genuine leather according to Muzzo",
+      "Crocodile embossed texture",
+      "Zipper closure",
+      "One main compartment; inner zip and slip pockets"
+    ],
+    "images": [
+      "media/black-satchel/01.jpg"
+    ],
+    "usd_price": "52.48"
+  },
+  {
+    "source_id": "maroon-handbag",
+    "name": "Maroon Women Hand-held Bag | Women’s Genuine Leather Handbag",
+    "category": "Handbags",
+    "inr_price": 4699,
+    "description": "Hand-held leather bag with a detachable shoulder strap.",
+    "facts": [
+      "Genuine leather according to Muzzo",
+      "Metal lock closure",
+      "One main compartment with inner pockets",
+      "Made in India"
+    ],
+    "images": [
+      "media/maroon-handbag/01.jpg"
+    ],
+    "usd_price": "49.33"
+  },
+  {
+    "source_id": "columbus-satchel",
+    "name": "Columbus 3 Compartment Medium Satchel Bag · Sage Green",
+    "category": "Handbags",
+    "inr_price": 3299,
+    "description": "Sage green medium satchel with three compartments.",
+    "facts": [
+      "Textured vegan leather according to Muzzo",
+      "Center zip divider; inner zip and slip pockets",
+      "28 × 12 × 22 cm; approximately 720 g",
+      "Detachable shoulder strap"
+    ],
+    "images": [
+      "media/columbus-satchel/01.webp",
+      "media/columbus-satchel/02.jpg"
+    ],
+    "usd_price": "34.64"
+  },
+  {
+    "source_id": "columbus-black",
+    "name": "Columbus 3 Compartment Medium Satchel Bag · Black",
+    "category": "Handbags",
+    "inr_price": 3000,
+    "description": "Black medium satchel with three compartments.",
+    "facts": [
+      "3 main compartments and 3 inner pockets",
+      "Zip closure",
+      "30.5 × 10 × 24 cm",
+      "Wipe with a damp cloth"
+    ],
+    "images": [
+      "media/columbus-black/01.webp",
+      "media/columbus-black/02.webp",
+      "media/columbus-black/03.webp"
+    ],
+    "usd_price": "31.50"
+  }
+]

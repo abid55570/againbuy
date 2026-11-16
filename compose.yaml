@@ -1,0 +1,206 @@
+services:
+  db:
+    image: mariadb:11.4
+    environment:
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      retries: 10
+
+  wordpress:
+    image: wordpress:php8.3-apache
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "${WORDPRESS_PORT:-8080}:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_AUTH_KEY: ${WORDPRESS_AUTH_KEY:?Set WordPress salts}
+      WORDPRESS_SECURE_AUTH_KEY: ${WORDPRESS_SECURE_AUTH_KEY:?Set WordPress salts}
+      WORDPRESS_LOGGED_IN_KEY: ${WORDPRESS_LOGGED_IN_KEY:?Set WordPress salts}
+      WORDPRESS_NONCE_KEY: ${WORDPRESS_NONCE_KEY:?Set WordPress salts}
+      WORDPRESS_AUTH_SALT: ${WORDPRESS_AUTH_SALT:?Set WordPress salts}
+      WORDPRESS_SECURE_AUTH_SALT: ${WORDPRESS_SECURE_AUTH_SALT:?Set WordPress salts}
+      WORDPRESS_LOGGED_IN_SALT: ${WORDPRESS_LOGGED_IN_SALT:?Set WordPress salts}
+      WORDPRESS_NONCE_SALT: ${WORDPRESS_NONCE_SALT:?Set WordPress salts}
+      WORDPRESS_DEBUG: ${WORDPRESS_DEBUG:-false}
+      S3_ENDPOINT: ${S3_ENDPOINT:-}
+      S3_PUBLIC_URL: ${S3_PUBLIC_URL:-}
+      S3_REGION: ${S3_REGION:-}
+      S3_BUCKET: ${S3_BUCKET:-}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-}
+      S3_PATH_STYLE: ${S3_PATH_STYLE:-true}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      APP_ENV: ${APP_ENV:-local}
+      RAZORPAY_MODE: ${RAZORPAY_MODE:-test}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-}
+      RAZORPAY_WEBHOOK_SECRET: ${RAZORPAY_WEBHOOK_SECRET:-}
+      GA4_MEASUREMENT_ID: ${GA4_MEASUREMENT_ID:-}
+      MAXMIND_LICENSE_KEY: ${MAXMIND_LICENSE_KEY:-}
+      DEFAULT_COUNTRY: ${DEFAULT_COUNTRY:-IN}
+      INDIA_DELIVERY_CHARGE_INR: ${INDIA_DELIVERY_CHARGE_INR:-120}
+      INTERNATIONAL_DELIVERY_CHARGE_USD: ${INTERNATIONAL_DELIVERY_CHARGE_USD:-}
+      TRUSTED_PROXY_CIDRS: ${TRUSTED_PROXY_CIDRS:-}
+      GOOGLE_GEOCODING_API_KEY: ${GOOGLE_GEOCODING_API_KEY:-}
+      LOCATION_AUTOFILL_ENABLED: ${LOCATION_AUTOFILL_ENABLED:-false}
+      SMTP_HOST: ${SMTP_HOST:-mailpit}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_ENCRYPTION: ${SMTP_ENCRYPTION:-none}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-AgainBuy}
+      WORDPRESS_CONFIG_EXTRA: |
+        if (getenv('S3_ENDPOINT') && getenv('S3_PUBLIC_URL') && getenv('S3_BUCKET') && getenv('S3_ACCESS_KEY') && getenv('S3_SECRET_KEY')) {
+          define('ADVMO_MINIO_KEY', getenv('S3_ACCESS_KEY'));
+          define('ADVMO_MINIO_SECRET', getenv('S3_SECRET_KEY'));
+          define('ADVMO_MINIO_BUCKET', getenv('S3_BUCKET'));
+          define('ADVMO_MINIO_DOMAIN', getenv('S3_PUBLIC_URL'));
+          define('ADVMO_MINIO_ENDPOINT', getenv('S3_ENDPOINT'));
+          define('ADVMO_MINIO_REGION', getenv('S3_REGION') ?: 'us-east-1');
+          define('ADVMO_MINIO_PATH_STYLE_ENDPOINT', getenv('S3_PATH_STYLE') === 'true');
+        }
+        if (getenv('REDIS_HOST')) {
+          define('WP_REDIS_HOST', getenv('REDIS_HOST'));
+          define('WP_REDIS_PORT', (int) (getenv('REDIS_PORT') ?: 6379));
+          define('WP_REDIS_PREFIX', 'againbuy:');
+          if (getenv('REDIS_PASSWORD')) define('WP_REDIS_PASSWORD', getenv('REDIS_PASSWORD'));
+        }
+        define('DISALLOW_FILE_EDIT', true);
+    volumes:
+      - wp_data:/var/www/html
+      - ./backend/plugin/againbuy-commerce-core:/var/www/html/wp-content/plugins/againbuy-commerce-core
+      - ./frontend/theme/againbuy:/var/www/html/wp-content/themes/againbuy
+
+  cli:
+    image: wordpress:cli-php8.3
+    depends_on:
+      - wordpress
+    profiles: [tools]
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_AUTH_KEY: ${WORDPRESS_AUTH_KEY:?Set WordPress salts}
+      WORDPRESS_SECURE_AUTH_KEY: ${WORDPRESS_SECURE_AUTH_KEY:?Set WordPress salts}
+      WORDPRESS_LOGGED_IN_KEY: ${WORDPRESS_LOGGED_IN_KEY:?Set WordPress salts}
+      WORDPRESS_NONCE_KEY: ${WORDPRESS_NONCE_KEY:?Set WordPress salts}
+      WORDPRESS_AUTH_SALT: ${WORDPRESS_AUTH_SALT:?Set WordPress salts}
+      WORDPRESS_SECURE_AUTH_SALT: ${WORDPRESS_SECURE_AUTH_SALT:?Set WordPress salts}
+      WORDPRESS_LOGGED_IN_SALT: ${WORDPRESS_LOGGED_IN_SALT:?Set WordPress salts}
+      WORDPRESS_NONCE_SALT: ${WORDPRESS_NONCE_SALT:?Set WordPress salts}
+      HOME: /tmp
+      APP_URL: ${APP_URL:-http://localhost:8080}
+      WP_ADMIN_USER: ${WP_ADMIN_USER}
+      WP_ADMIN_PASSWORD: ${WP_ADMIN_PASSWORD}
+      WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
+      ANALYTICS_USER: ${ANALYTICS_USER:-}
+      ANALYTICS_PASSWORD: ${ANALYTICS_PASSWORD:-}
+      ANALYTICS_EMAIL: ${ANALYTICS_EMAIL:-}
+      S3_ENDPOINT: ${S3_ENDPOINT:-}
+      S3_PUBLIC_URL: ${S3_PUBLIC_URL:-}
+      S3_REGION: ${S3_REGION:-}
+      S3_BUCKET: ${S3_BUCKET:-}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-}
+      S3_PATH_STYLE: ${S3_PATH_STYLE:-true}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      APP_ENV: ${APP_ENV:-local}
+      RAZORPAY_MODE: ${RAZORPAY_MODE:-test}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-}
+      RAZORPAY_WEBHOOK_SECRET: ${RAZORPAY_WEBHOOK_SECRET:-}
+      GA4_MEASUREMENT_ID: ${GA4_MEASUREMENT_ID:-}
+      MAXMIND_LICENSE_KEY: ${MAXMIND_LICENSE_KEY:-}
+      DEFAULT_COUNTRY: ${DEFAULT_COUNTRY:-IN}
+      INDIA_DELIVERY_CHARGE_INR: ${INDIA_DELIVERY_CHARGE_INR:-120}
+      INTERNATIONAL_DELIVERY_CHARGE_USD: ${INTERNATIONAL_DELIVERY_CHARGE_USD:-}
+      TRUSTED_PROXY_CIDRS: ${TRUSTED_PROXY_CIDRS:-}
+      GOOGLE_GEOCODING_API_KEY: ${GOOGLE_GEOCODING_API_KEY:-}
+      LOCATION_AUTOFILL_ENABLED: ${LOCATION_AUTOFILL_ENABLED:-false}
+      SMTP_HOST: ${SMTP_HOST:-mailpit}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_ENCRYPTION: ${SMTP_ENCRYPTION:-none}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-AgainBuy}
+      WORDPRESS_CONFIG_EXTRA: |
+        if (getenv('S3_ENDPOINT') && getenv('S3_PUBLIC_URL') && getenv('S3_BUCKET') && getenv('S3_ACCESS_KEY') && getenv('S3_SECRET_KEY')) {
+          define('ADVMO_MINIO_KEY', getenv('S3_ACCESS_KEY'));
+          define('ADVMO_MINIO_SECRET', getenv('S3_SECRET_KEY'));
+          define('ADVMO_MINIO_BUCKET', getenv('S3_BUCKET'));
+          define('ADVMO_MINIO_DOMAIN', getenv('S3_PUBLIC_URL'));
+          define('ADVMO_MINIO_ENDPOINT', getenv('S3_ENDPOINT'));
+          define('ADVMO_MINIO_REGION', getenv('S3_REGION') ?: 'us-east-1');
+          define('ADVMO_MINIO_PATH_STYLE_ENDPOINT', getenv('S3_PATH_STYLE') === 'true');
+        }
+        if (getenv('REDIS_HOST')) {
+          define('WP_REDIS_HOST', getenv('REDIS_HOST'));
+          define('WP_REDIS_PORT', (int) (getenv('REDIS_PORT') ?: 6379));
+          define('WP_REDIS_PREFIX', 'againbuy:');
+          if (getenv('REDIS_PASSWORD')) define('WP_REDIS_PASSWORD', getenv('REDIS_PASSWORD'));
+        }
+        define('DISALLOW_FILE_EDIT', true);
+    user: "33:33"
+    volumes:
+      - wp_data:/var/www/html
+      - ./backend/plugin/againbuy-commerce-core:/var/www/html/wp-content/plugins/againbuy-commerce-core
+      - ./frontend/theme/againbuy:/var/www/html/wp-content/themes/againbuy
+      - ./backend/tests:/tests/backend:ro
+      - ./backend/catalog:/catalog:ro
+      - ./frontend/tests:/tests/frontend:ro
+      - ./docker:/scripts:ro
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  s3mock:
+    image: adobe/s3mock:5.2.3
+    profiles: [storage-test]
+    environment:
+      COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: againbuy
+      COM_ADOBE_TESTING_S3MOCK_STORE_ROOT: /s3mockroot
+      COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT: 'true'
+    ports:
+      - '127.0.0.1:9090:9090'
+    volumes:
+      - s3mock_data:/s3mockroot
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - "127.0.0.1:${MAILPIT_UI_PORT:-8025}:8025"
+
+volumes:
+  db_data:
+  wp_data:
+  redis_data:
+  s3mock_data:

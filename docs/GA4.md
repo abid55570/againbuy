@@ -1,0 +1,5 @@
+# GA4 storefront events
+
+Set `GA4_MEASUREMENT_ID` in `.env`, then run `docker compose --profile tools run --rm cli sh /scripts/install.sh`. The official Google Analytics for WooCommerce plugin is pinned to version 2.4.4. It sends page views and these ecommerce events: product list impressions (`view_item_list`), product selection (`select_content`), product detail views (`view_item`), cart additions (`add_to_cart`), cart removals (`remove_from_cart`), checkout starts (`begin_checkout`), and successful purchases (`purchase`). It does not count WordPress admin visits. Do not install a second GA tag for the same stream.
+
+The local app uses the Muzzo test stream ID from the earlier project. Replace it in `.env` for a separate AgainBuy production stream. Verify events in GA4 DebugView after deployment. Local source and plugin checks cannot prove that Google received an event. The payment gateway is currently disabled without Razorpay credentials, so a paid purchase event cannot be tested yet. If serving visitors in regions that require consent, configure consent before enabling tracking there.
