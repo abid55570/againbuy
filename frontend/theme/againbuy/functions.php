@@ -45,6 +45,7 @@ function againbuy_registration_view(): bool {
         && (isset($_POST['register']) || (isset($_GET['account']) && $_GET['account'] === 'create'));
 }
 add_filter('body_class', static function (array $classes): array {
+    if (is_account_page() && is_user_logged_in()) { $classes[] = 'againbuy-account'; }
     if (is_account_page() && !is_user_logged_in() && !is_wc_endpoint_url()) {
         $classes[] = 'againbuy-auth';
         $classes[] = againbuy_registration_view() ? 'auth-create' : 'auth-login';

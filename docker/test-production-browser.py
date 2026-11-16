@@ -6,6 +6,8 @@ import subprocess
 import tempfile
 import time
 import urllib.request
+import urllib.parse
+import http.cookiejar
 from pathlib import Path
 
 from websockets.sync.client import connect
@@ -73,6 +75,27 @@ def run():
                 wait_for(lambda: browser.evaluate("Number(document.querySelector('.header-cart-count')?.innerText) === 1"), "AJAX cart count did not update")
                 wait_for(lambda: browser.evaluate("document.querySelector('.againbuy-cart-toast')?.classList.contains('is-visible')"), "Cart confirmation toast did not appear")
                 print("Production catalog and product detail passed.")
+                env = dict(line.split('=', 1) for line in Path(__file__).resolve().parents[1].joinpath('.env').read_text().splitlines() if '=' in line and not line.startswith('#'))
+                if not env.get('ANALYTICS_USER') or not env.get('ANALYTICS_PASSWORD'):
+                    raise RuntimeError('Set local ANALYTICS_USER and ANALYTICS_PASSWORD for the signed-in account checks')
+                jar = http.cookiejar.CookieJar()
+                opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+                opener.open(BASE + '/wp-login.php', timeout=20).read()
+                payload = urllib.parse.urlencode({'log': env['ANALYTICS_USER'], 'pwd': env['ANALYTICS_PASSWORD'], 'wp-submit': 'Log In', 'testcookie': '1', 'redirect_to': BASE + '/my-account/'}).encode()
+                opener.open(BASE + '/wp-login.php', payload, timeout=20).read()
+                cookies = [{'name': c.name, 'value': c.value, 'domain': c.domain, 'path': c.path, 'secure': c.secure, 'httpOnly': True} for c in jar]
+                assert any(c['name'].startswith('wordpress_logged_in_') for c in cookies), 'Account test login failed'
+                browser.call('Network.setCookies', {'cookies': cookies})
+                account_paths = ('/my-account/', '/my-account/orders/', '/my-account/downloads/', '/my-account/edit-address/', '/my-account/edit-address/billing/', '/my-account/edit-address/shipping/', '/my-account/edit-account/')
+                for width in (320, 390, 768, 1280):
+                    browser.call('Emulation.setDeviceMetricsOverride', {'width': width, 'height': 850, 'deviceScaleFactor': 1, 'mobile': width < 768})
+                    for path in account_paths:
+                        browser.navigate(BASE + path)
+                        state = browser.evaluate("({signed:document.body.classList.contains('againbuy-account'),nav:!!document.querySelector('.woocommerce-MyAccount-navigation'),content:!!document.querySelector('.woocommerce-MyAccount-content'),overflow:document.documentElement.scrollWidth>innerWidth+1})")
+                        assert state['signed'] and state['nav'] and state['content'] and not state['overflow'], f'Signed-in account layout failed at {width}px: {path}, {state}'
+                        if path == '/my-account/':
+                            assert browser.evaluate("document.querySelectorAll('.account-shortcuts>a').length") == 3, 'Account dashboard shortcuts missing'
+                    print(f'Signed-in account pages passed: {width}px')
         finally:
             process.terminate()
             try:
