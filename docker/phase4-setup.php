@@ -1,6 +1,9 @@
 <?php
 update_option('woocommerce_feature_rate_limit_checkout_enabled', 'yes');
 update_option('woocommerce_default_country', 'IN');
+update_option('woocommerce_enable_guest_checkout', 'no');
+update_option('woocommerce_enable_signup_and_login_from_checkout', 'yes');
+update_option('woocommerce_enable_checkout_login_reminder', 'yes');
 foreach (['India' => 'IN', 'United States' => 'US'] as $name => $country) {
     $existing_id = 0;
     foreach (WC_Shipping_Zones::get_zones() as $zone) {

@@ -23,7 +23,7 @@ mkdir -p "$backup"
 gzip -t "$backup/database.sql.gz"
 tar -czf "$backup/code.tgz" backend/plugin frontend/theme docker compose.yaml compose.production.yaml
 cp .env "$backup/runtime.env"
-rsync -a --exclude=.git --exclude=.env --include=.env.example --exclude='.env.*' --exclude=backups --exclude=artifacts "$source_dir/" "$runtime/"
+rsync -a --chmod=D755,F644 --exclude=.git --exclude=.env --include=.env.example --exclude='.env.*' --exclude=backups --exclude=artifacts "$source_dir/" "$runtime/"
 "${compose[@]}" config --quiet
 "${compose[@]}" up -d db redis wordpress
 "${compose[@]}" --profile tools run --rm -T cli wp eval 'AgainBuy_Commerce_Core::activate();'
