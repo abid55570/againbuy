@@ -2,11 +2,22 @@
 get_header();
 $featured = wc_get_products(['limit' => 1, 'meta_key' => '_againbuy_source_id', 'meta_value' => 'copper-kit']);
 $hero = $featured ? ($featured[0]->get_gallery_image_ids()[0] ?? $featured[0]->get_image_id()) : 0;
+$drifton_post = get_page_by_path('drifton-natural-alum-underarm-roll-on-deodorant-stick-for-men-women-60g', OBJECT, 'product');
+$drifton = $drifton_post ? wc_get_product($drifton_post->ID) : false;
 ?>
-<section class="hero" aria-labelledby="hero-title">
+<div class="featured-carousel" aria-label="Featured products" aria-roledescription="carousel">
+<section class="hero featured-slide" aria-labelledby="hero-title">
     <div class="hero-copy"><p class="eyebrow">Featured · Copper bottle set</p><h1 id="hero-title">Made to carry, made to keep.</h1><p>A hammered copper bottle with its own fabric pouch and cleaning brush. See every detail before you decide.</p><?php if ($featured) : ?><p class="hero-price"><?php echo wp_kses_post($featured[0]->get_price_html()); ?></p><?php endif; ?><div class="hero-actions"><a class="button button-primary" href="<?php echo esc_url($featured ? $featured[0]->get_permalink() : wc_get_page_permalink('shop')); ?>">Explore the bottle <span aria-hidden="true">↗</span></a><a class="hero-secondary" href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>">Shop all products</a></div></div>
     <?php if ($hero) : ?><a class="hero-art" href="<?php echo esc_url($featured[0]->get_permalink()); ?>" aria-label="View <?php echo esc_attr($featured[0]->get_name()); ?>"><?php echo wp_get_attachment_image($hero, 'large', false, ['alt' => $featured[0]->get_name()]); ?></a><?php else : ?><div class="hero-art" aria-hidden="true"><span>AB</span><div class="hero-circle"></div></div><?php endif; ?>
 </section>
+<?php if ($drifton && $drifton->get_status() === 'publish') : ?>
+<section class="hero featured-slide" aria-labelledby="drifton-title" hidden>
+    <div class="hero-copy"><p class="eyebrow">Featured · DriftOn</p><h2 id="drifton-title">DriftOn, every day.</h2><p><?php echo esc_html($drifton->get_name()); ?></p><p class="hero-price"><?php echo wp_kses_post($drifton->get_price_html()); ?></p><div class="hero-actions"><a class="button button-primary" href="<?php echo esc_url($drifton->get_permalink()); ?>">Explore DriftOn <span aria-hidden="true">↗</span></a><a class="hero-secondary" href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>">Shop all products</a></div></div>
+    <a class="hero-art" href="<?php echo esc_url($drifton->get_permalink()); ?>" aria-label="View <?php echo esc_attr($drifton->get_name()); ?>"><?php echo $drifton->get_image('large', ['loading' => 'eager']); ?></a>
+</section>
+<div class="featured-controls" hidden><button type="button" data-slide="0" aria-label="Show copper bottle" aria-pressed="true">1</button><button type="button" data-slide="1" aria-label="Show DriftOn" aria-pressed="false">2</button><button type="button" class="featured-pause" aria-pressed="false">Pause</button></div>
+<?php endif; ?>
+</div>
 <?php
 $categories = get_terms(['taxonomy' => 'product_cat', 'hide_empty' => true, 'number' => 6, 'exclude' => [get_option('default_product_cat')]]);
 if (!is_wp_error($categories) && $categories) : ?>

@@ -48,7 +48,11 @@ def run():
                         assert state["protocol"] == "https:" and state["main"] and state["broken"] == 0, f"Page failed at {width}px: {path}, {state}"
                         assert state["scroll"] <= state["width"] + 1, f"Horizontal overflow at {width}px: {path}, {state}"
                     print(f"Production layout passed: {width}px")
-                browser.navigate(BASE + "/shop/")
+                    browser.navigate(BASE + "/shop/")
+                    browser.evaluate("window.scrollTo(0, 650)")
+                    wait_for(lambda: browser.evaluate("scrollY >= 600"), "Shop did not scroll")
+                    header = browser.evaluate("(()=>{const h=document.querySelector('.site-header');const r=h.getBoundingClientRect();return {top:r.top,bottom:r.bottom,position:getComputedStyle(h).position,nav:!!h.querySelector('.site-nav'),cart:!!h.querySelector('.cart-link')}})()")
+                    assert header['position'] == 'sticky' and abs(header['top']) <= 1 and header['bottom'] > 0 and header['nav'] and header['cart'], f"Header disappeared after scroll at {width}px: {header}"
                 assert browser.evaluate("document.querySelectorAll('ul.products li.product').length") >= 11, "Shop catalog is unexpectedly incomplete"
                 browser.navigate(BASE + "/product/muzzo-copper-kit/")
                 product = browser.evaluate("({title:!!document.querySelector('.product_title'),price:!!document.querySelector('.summary .price'),cart:!!document.querySelector('form.cart'),photos:document.querySelectorAll('.woocommerce-product-gallery__image').length,related:document.querySelectorAll('.related li.product').length})")
@@ -62,6 +66,9 @@ def run():
                     browser.call("Emulation.setDeviceMetricsOverride", {"width": width, "height": 850, "deviceScaleFactor": 1, "mobile": width < 768})
                     assert browser.evaluate("document.documentElement.scrollWidth <= innerWidth + 1"), f"Registration overflow at {width}px"
                 browser.navigate(BASE + "/")
+                assert browser.evaluate("document.querySelectorAll('.featured-slide').length") == 2, "Featured products missing"
+                wait_for(lambda: browser.evaluate("!document.querySelectorAll('.featured-slide')[1].hidden"), "DriftOn banner did not rotate", seconds=5)
+                assert browser.evaluate("document.querySelectorAll('.featured-slide')[1].querySelector('.hero-price').innerText.length > 0 && document.querySelectorAll('.featured-slide')[1].querySelector('.hero-art img').naturalWidth > 0"), "DriftOn image or price missing"
                 browser.evaluate("document.querySelector('a.add_to_cart_button')?.click()")
                 wait_for(lambda: browser.evaluate("Number(document.querySelector('.header-cart-count')?.innerText) === 1"), "AJAX cart count did not update")
                 wait_for(lambda: browser.evaluate("document.querySelector('.againbuy-cart-toast')?.classList.contains('is-visible')"), "Cart confirmation toast did not appear")

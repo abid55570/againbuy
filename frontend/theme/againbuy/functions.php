@@ -14,6 +14,7 @@ add_action('after_setup_theme', static function () {
 add_action('wp_enqueue_scripts', static function () {
     wp_enqueue_style('againbuy-style', get_stylesheet_uri(), [], (string) filemtime(get_stylesheet_directory() . '/style.css'));
     wp_enqueue_script('againbuy-card-gallery', get_theme_file_uri('card-gallery.js'), [], wp_get_theme()->get('Version'), true);
+    if (is_front_page()) { wp_enqueue_script('againbuy-featured', get_theme_file_uri('featured.js'), [], (string) filemtime(get_stylesheet_directory() . '/featured.js'), true); }
     wp_enqueue_script('wc-cart-fragments');
     wp_enqueue_script('againbuy-cart-feedback', get_theme_file_uri('cart-feedback.js'), ['jquery', 'wc-cart-fragments'], wp_get_theme()->get('Version'), true);
     if (is_checkout() && !is_order_received_page() && getenv('LOCATION_AUTOFILL_ENABLED') === 'true' && getenv('GOOGLE_GEOCODING_API_KEY')) {
