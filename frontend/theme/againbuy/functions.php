@@ -32,6 +32,35 @@ function againbuy_cart_count(): int {
     return function_exists('WC') && WC()->cart ? WC()->cart->get_cart_contents_count() : 0;
 }
 
+function againbuy_customer_name(): string {
+    $user = wp_get_current_user();
+    if (!$user->exists()) { return ''; }
+    foreach ([$user->first_name, get_user_meta($user->ID, 'billing_first_name', true), $user->display_name] as $name) {
+        $name = trim(wp_strip_all_tags((string) $name));
+        if ($name !== '' && !is_email($name)) { return $name; }
+    }
+    return 'My account';
+}
+
+add_action('woocommerce_register_form_start', static function (): void {
+    $name = isset($_POST['first_name']) && is_string($_POST['first_name']) ? sanitize_text_field(wp_unslash($_POST['first_name'])) : '';
+    echo '<p class="woocommerce-form-row form-row form-row-wide"><label for="reg_first_name">Your name <span class="required">*</span></label><input type="text" class="input-text" name="first_name" id="reg_first_name" autocomplete="given-name" maxlength="80" required value="' . esc_attr($name) . '"></p>';
+});
+add_filter('woocommerce_registration_errors', static function ($errors) {
+    $name = isset($_POST['first_name']) && is_string($_POST['first_name']) ? sanitize_text_field(wp_unslash($_POST['first_name'])) : '';
+    if ($name === '' || mb_strlen($name) > 80) { $errors->add('againbuy_name', 'Please enter your name (up to 80 characters).'); }
+    return $errors;
+});
+add_action('woocommerce_created_customer', static function ($id): void {
+    if (!isset($_POST['register'], $_POST['first_name']) || !is_string($_POST['first_name'])) { return; }
+    $name = sanitize_text_field(wp_unslash($_POST['first_name']));
+    if ($name === '' || mb_strlen($name) > 80) { return; }
+    wp_update_user(['ID' => $id, 'first_name' => $name, 'display_name' => $name]);
+});
+add_action('template_redirect', static function (): void {
+    if (is_user_logged_in()) { nocache_headers(); }
+});
+
 add_filter('woocommerce_add_to_cart_fragments', static function (array $fragments): array {
     $count = againbuy_cart_count();
     $fragments['.header-cart-count'] = '<span class="header-cart-count" aria-live="polite">' . esc_html((string) $count) . '</span>';

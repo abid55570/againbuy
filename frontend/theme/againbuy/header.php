@@ -20,7 +20,7 @@
         </form>
         <div class="header-actions">
             <span class="currency-status"><?php echo esc_html(get_woocommerce_currency() === 'INR' ? '₹ INR' : '$ USD'); ?></span>
-            <?php $account_user = wp_get_current_user(); $account_name = $account_user->first_name ?: $account_user->display_name; ?>
+            <?php $account_name = againbuy_customer_name(); ?>
             <a class="header-account<?php echo is_user_logged_in() ? ' is-signed-in' : ''; ?>" href="<?php echo esc_url(wc_get_page_permalink('myaccount')); ?>"><?php if (is_user_logged_in()) : ?><span class="account-status">Signed in</span><span class="account-name"><?php echo esc_html($account_name); ?></span><?php else : ?><span>Sign in</span><?php endif; ?></a>
             <a class="cart-link" href="<?php echo esc_url(wc_get_cart_url()); ?>">Cart <span class="header-cart-count" aria-live="polite"><?php echo esc_html((string) againbuy_cart_count()); ?></span></a>
         </div>

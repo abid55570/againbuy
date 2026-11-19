@@ -2,7 +2,7 @@
 defined('ABSPATH') || exit;
 $customer = wp_get_current_user();
 ?>
-<div class="account-welcome"><p class="eyebrow">Your account</p><h2>Welcome, <?php echo esc_html($customer->first_name ?: $customer->display_name); ?></h2><p>Find your orders, update delivery addresses and manage your account.</p></div>
+<div class="account-welcome"><p class="eyebrow">Your account</p><h2>Welcome, <?php echo esc_html(againbuy_customer_name()); ?></h2><p>Find your orders, update delivery addresses and manage your account.</p></div>
 <div class="account-shortcuts">
     <a href="<?php echo esc_url(wc_get_account_endpoint_url('orders')); ?>"><span class="account-shortcut-icon" aria-hidden="true">↗</span><h3>Your orders</h3><p>View order details and payment status.</p><span>View orders →</span></a>
     <a href="<?php echo esc_url(wc_get_account_endpoint_url('edit-address')); ?>"><span class="account-shortcut-icon" aria-hidden="true">⌂</span><h3>Delivery addresses</h3><p>Manage your billing and shipping addresses.</p><span>Manage addresses →</span></a>
