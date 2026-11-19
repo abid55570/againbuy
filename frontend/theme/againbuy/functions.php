@@ -47,6 +47,7 @@ add_action('woocommerce_register_form_start', static function (): void {
     echo '<p class="woocommerce-form-row form-row form-row-wide"><label for="reg_first_name">Your name <span class="required">*</span></label><input type="text" class="input-text" name="first_name" id="reg_first_name" autocomplete="given-name" maxlength="80" required value="' . esc_attr($name) . '"></p>';
 });
 add_filter('woocommerce_registration_errors', static function ($errors) {
+    if (!isset($_POST['register'])) { return $errors; }
     $name = isset($_POST['first_name']) && is_string($_POST['first_name']) ? sanitize_text_field(wp_unslash($_POST['first_name'])) : '';
     if ($name === '' || mb_strlen($name) > 80) { $errors->add('againbuy_name', 'Please enter your name (up to 80 characters).'); }
     return $errors;
