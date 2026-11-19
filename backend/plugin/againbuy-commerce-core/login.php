@@ -35,9 +35,12 @@ add_filter('login_title', static fn() => 'Sign in | AgainBuy');
 add_action('login_enqueue_scripts', static function (): void {
     wp_enqueue_style('againbuy-login', plugins_url('login.css', __FILE__), [], (string) filemtime(__DIR__ . '/login.css'));
 });
-add_action('login_head', static function (): void {
+function againbuy_brand_favicon(): void {
     echo '<link rel="icon" type="image/svg+xml" href="' . esc_url(get_stylesheet_directory_uri() . '/favicon.svg') . '">';
-});
+}
+add_action('login_head', 'againbuy_brand_favicon', 99);
+add_action('admin_head', 'againbuy_brand_favicon', 99);
+add_filter('get_site_icon_url', static fn() => get_stylesheet_directory_uri() . '/favicon.svg');
 add_action('admin_bar_menu', static function ($bar): void { $bar->remove_node('wp-logo'); }, 999);
 add_filter('admin_footer_text', static fn() => 'AgainBuy');
 add_filter('admin_title', static fn($title) => str_replace('WordPress', 'AgainBuy', $title));
