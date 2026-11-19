@@ -8,6 +8,7 @@
 
 if (!defined('ABSPATH')) { exit; }
 require_once __DIR__ . '/analytics.php';
+require_once __DIR__ . '/login.php';
 
 final class AgainBuy_Commerce_Core {
     private const SCHEMA_VERSION = '4';
