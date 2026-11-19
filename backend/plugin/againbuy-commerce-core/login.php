@@ -10,6 +10,11 @@ add_action('init', static function (): void {
 }, 0);
 
 add_filter('login_url', static fn($url, $redirect, $reauth) => add_query_arg(array_filter(['redirect_to' => $redirect, 'reauth' => $reauth ? '1' : '']), home_url('/login')), 10, 3);
+foreach (['lostpassword_url', 'logout_url'] as $hook) {
+    add_filter($hook, static fn($url) => str_replace('/wp-login.php', '/login', $url));
+}
+add_filter('register_url', static fn() => home_url('/my-account/?account=create'));
+add_filter('retrieve_password_message', static fn($message) => str_replace('/wp-login.php', '/login', $message));
 add_action('login_init', static function (): void {
     if (isset($_REQUEST['loginSocial'])) { return; }
     $path = wp_parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
