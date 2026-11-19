@@ -15,7 +15,7 @@ $drifton = $drifton_post ? wc_get_product($drifton_post->ID) : false;
     <div class="hero-copy"><p class="eyebrow">Featured · DriftOn</p><h2 id="drifton-title">DriftOn, every day.</h2><p><?php echo esc_html($drifton->get_name()); ?></p><p class="hero-price"><?php echo wp_kses_post($drifton->get_price_html()); ?></p><div class="hero-actions"><a class="button button-primary" href="<?php echo esc_url($drifton->get_permalink()); ?>">Explore DriftOn <span aria-hidden="true">↗</span></a><a class="hero-secondary" href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>">Shop all products</a></div></div>
     <a class="hero-art" href="<?php echo esc_url($drifton->get_permalink()); ?>" aria-label="View <?php echo esc_attr($drifton->get_name()); ?>"><?php echo $drifton->get_image('large', ['loading' => 'eager']); ?></a>
 </section>
-<div class="featured-controls" hidden><button type="button" data-slide="0" aria-label="Show copper bottle" aria-pressed="true">1</button><button type="button" data-slide="1" aria-label="Show DriftOn" aria-pressed="false">2</button><button type="button" class="featured-pause" aria-pressed="false">Pause</button></div>
+<div class="featured-controls" hidden><button type="button" data-slide="0" aria-label="Show copper bottle" aria-pressed="true">1</button><button type="button" data-slide="1" aria-label="Show DriftOn" aria-pressed="false">2</button></div>
 <?php endif; ?>
 </div>
 <?php
