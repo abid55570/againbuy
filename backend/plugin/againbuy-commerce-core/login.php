@@ -32,3 +32,4 @@ add_action('login_head', static function (): void {
 });
 add_action('admin_bar_menu', static function ($bar): void { $bar->remove_node('wp-logo'); }, 999);
 add_filter('admin_footer_text', static fn() => 'AgainBuy');
+add_filter('admin_title', static fn($title) => str_replace('WordPress', 'AgainBuy', $title));
