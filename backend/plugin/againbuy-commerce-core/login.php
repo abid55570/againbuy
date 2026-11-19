@@ -4,6 +4,9 @@ if (!defined('ABSPATH')) { exit; }
 add_action('init', static function (): void {
     $path = wp_parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
     if (rtrim((string) $path, '/') !== '/login') { return; }
+    global $user_login, $error, $errors, $action, $interim_login, $redirect_to, $rememberme, $reauth;
+    $user_login = '';
+    $error = '';
     $GLOBALS['pagenow'] = 'wp-login.php';
     require ABSPATH . 'wp-login.php';
     exit;

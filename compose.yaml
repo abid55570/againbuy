@@ -67,6 +67,10 @@ services:
       MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-}
       MAIL_FROM_NAME: ${MAIL_FROM_NAME:-AgainBuy}
       WORDPRESS_CONFIG_EXTRA: |
+        if (getenv('APP_ENV') === 'production') {
+          define('WP_DEBUG_DISPLAY', false);
+          ini_set('display_errors', '0');
+        }
         if (getenv('S3_ENDPOINT') && getenv('S3_PUBLIC_URL') && getenv('S3_BUCKET') && getenv('S3_ACCESS_KEY') && getenv('S3_SECRET_KEY')) {
           define('ADVMO_MINIO_KEY', getenv('S3_ACCESS_KEY'));
           define('ADVMO_MINIO_SECRET', getenv('S3_SECRET_KEY'));
@@ -145,6 +149,10 @@ services:
       MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-}
       MAIL_FROM_NAME: ${MAIL_FROM_NAME:-AgainBuy}
       WORDPRESS_CONFIG_EXTRA: |
+        if (getenv('APP_ENV') === 'production') {
+          define('WP_DEBUG_DISPLAY', false);
+          ini_set('display_errors', '0');
+        }
         if (getenv('S3_ENDPOINT') && getenv('S3_PUBLIC_URL') && getenv('S3_BUCKET') && getenv('S3_ACCESS_KEY') && getenv('S3_SECRET_KEY')) {
           define('ADVMO_MINIO_KEY', getenv('S3_ACCESS_KEY'));
           define('ADVMO_MINIO_SECRET', getenv('S3_SECRET_KEY'));
