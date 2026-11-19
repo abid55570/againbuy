@@ -12,6 +12,7 @@ require_once __DIR__ . '/analytics.php';
 final class AgainBuy_Commerce_Core {
     private const SCHEMA_VERSION = '4';
     public static function boot(): void {
+        add_filter('woocommerce_ga_disable_tracking', [__CLASS__, 'exclude_staff_tracking']);
         add_action('template_redirect', [__CLASS__, 'test_country_request']);
         add_filter('woocommerce_currency', [__CLASS__, 'currency']);
         foreach (['price', 'regular_price', 'sale_price'] as $field) {
@@ -48,6 +49,12 @@ final class AgainBuy_Commerce_Core {
             return is_email($configured) ? $configured : $from;
         });
         add_filter('wp_mail_from_name', static fn($name) => getenv('MAIL_FROM_NAME') ?: $name);
+    }
+
+    public static function exclude_staff_tracking(bool $disabled): bool {
+        return $disabled || is_admin() || current_user_can('manage_options')
+            || current_user_can('edit_products') || current_user_can('edit_shop_orders')
+            || current_user_can('view_woocommerce_reports');
     }
 
     public static function allow_report_admin(bool $prevent): bool {
